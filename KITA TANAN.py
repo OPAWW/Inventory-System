@@ -179,5 +179,78 @@ class InventoryApp(tk.Tk):
         elif view == "delete":
             self.view_delete()
 
+    def view_display(self):
+        tk.Label(
+            self.content, text="Inventory Records",
+            font=self.title_font, bg=self.BG, fg=self.TEXT
+        ).pack(pady=10)
+
+        cols = ("Name", "Unit", "Quantity", "Price")
+
+        # Create the table with column headers
+        tree = ttk.Treeview(self.content, columns=cols, show="headings", height=15)
+
+        for col in cols:
+            tree.heading(col, text=col)
+            tree.column(col, anchor="center", width=150)
+
+        # Apply dark theme styling to the Treeview widget
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure("Treeview",
+                        font=("Consolas", 10),
+                        background=self.PANEL,
+                        foreground=self.TEXT,
+                        fieldbackground=self.PANEL)
+        style.configure("Treeview.Heading",
+                        font=("Consolas", 10, "bold"),
+                        background=self.ACCENT,
+                        foreground=self.TEXT)
+
+        tree.pack(fill="both", expand=True, padx=20)
+
+        # Populate table rows from the inventory file
+        for p in load_products():
+            tree.insert("", "end",
+                        values=(p["name"], p["unit"], p["quantity"], p["price"]))
+
+    def view_add(self):
+        tk.Label(
+            self.content, text="Add Product",
+            font=self.title_font, bg=self.BG, fg=self.TEXT
+        ).pack(pady=10)
+
+        entries = {}
+
+        # Render one label + entry pair for each field
+        for field in ["Name", "Unit", "Quantity", "Price"]:
+            tk.Label(
+                self.content, text=field,
+                font=self.header_font, bg=self.BG, fg=self.TEXT
+            ).pack()
+
+            e = tk.Entry(self.content, font=self.normal_font)
+            e.pack()
+            entries[field] = e
+
+        def add():
+            # Call save_product with values from all four entry fields
+            save_product(
+                entries["Name"].get(),
+                entries["Unit"].get(),
+                entries["Quantity"].get(),
+                entries["Price"].get()
+            )
+            messagebox.showinfo("Success", "Product Added!")
+            self.show_view("display")   # Return to inventory list after adding
+
+        tk.Button(
+            self.content, text="Add Product",
+            font=self.button_font,
+            bg=self.GREEN,
+            fg="black",
+            command=add
+        ).pack(pady=10)
+
 
 
