@@ -304,3 +304,92 @@ class InventoryApp(tk.Tk):
             fg=self.TEXT,
             command=search
         ).pack()
+
+    def view_update(self):
+        tk.Label(
+            self.content, text="Update Product",
+            font=self.title_font, bg=self.BG, fg=self.TEXT
+        ).pack(pady=10)
+
+        fields = {}
+        labels = [
+            "Current Name (to find)",
+            "New Name",
+            "New Unit",
+            "New Quantity",
+            "New Price"
+        ]
+
+        for label in labels:
+            tk.Label(
+                self.content, text=label,
+                font=self.header_font, bg=self.BG, fg=self.TEXT
+            ).pack()
+
+            e = tk.Entry(self.content, font=self.normal_font)
+            e.pack()
+            fields[label] = e
+
+        def update():
+            data   = load_products()
+            target = fields["Current Name (to find)"].get().strip().lower()
+
+            # Find the matching product and overwrite only non-empty new fields
+            for p in data:
+                if p["name"].lower() == target:
+                    if fields["New Name"].get():
+                        p["name"]     = fields["New Name"].get()
+                    if fields["New Unit"].get():
+                        p["unit"]     = fields["New Unit"].get()
+                    if fields["New Quantity"].get():
+                        p["quantity"] = fields["New Quantity"].get()
+                    if fields["New Price"].get():
+                        p["price"]    = fields["New Price"].get()
+
+            # Save the entire updated list back to file
+            write_all_products(data)
+            messagebox.showinfo("Updated", "Product Updated Successfully!")
+            self.show_view("display")
+
+        tk.Button(
+            self.content, text="Update Product",
+            font=self.button_font,
+            bg=self.ACCENT,
+            fg=self.TEXT,
+            command=update
+        ).pack(pady=10)
+
+    def view_delete(self):
+        tk.Label(
+            self.content, text="Delete Product",
+            font=self.title_font, bg=self.BG, fg=self.TEXT
+        ).pack(pady=10)
+
+        entry = tk.Entry(self.content, font=self.normal_font)
+        entry.pack()
+
+        def delete():
+            data = load_products()
+
+            # Keep all products whose name does NOT match the entered name
+            data = [p for p in data if p["name"].lower() != entry.get().lower()]
+
+            write_all_products(data)   # Rewrite file without the deleted product
+            messagebox.showinfo("Deleted", "Product Removed!")
+            self.show_view("display")
+
+        tk.Button(
+            self.content, text="Delete",
+            font=self.button_font,
+            bg="#3a3a3a",
+            fg=self.TEXT,
+            command=delete
+        ).pack(pady=10)
+
+
+# -----------------------------------------------------------------------------
+# ENTRY POINT — launches the app (part of Member 5's section)
+# -----------------------------------------------------------------------------
+if __name__ == "__main__":
+    app = InventoryApp()
+    app.mainloop()
