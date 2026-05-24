@@ -252,5 +252,55 @@ class InventoryApp(tk.Tk):
             command=add
         ).pack(pady=10)
 
+    def view_search(self):
+        tk.Label(
+            self.content, text="Search Product",
+            font=self.title_font, bg=self.BG, fg=self.TEXT
+        ).pack(pady=10)
 
+        entry = tk.Entry(self.content, font=self.normal_font)
+        entry.pack()
 
+        # Listbox to display all matching results
+        result = tk.Listbox(
+            self.content,
+            font=self.record_font,
+            width=60, height=10,
+            bg=self.PANEL,
+            fg=self.TEXT,
+            selectbackground=self.HIGHLIGHT
+        )
+        result.pack(pady=10)
+
+        def search():
+            result.delete(0, tk.END)     # Clear previous results before new search
+            keyword = entry.get().strip()
+
+            # Guard: do not search if the field is empty
+            if keyword == "":
+                messagebox.showerror("Error", "Invalid Input")
+                return
+
+            found = False
+
+            # Case-insensitive substring match against product names
+            for p in load_products():
+                if keyword.lower() in p["name"].lower():
+                    result.insert(
+                        tk.END,
+                        f"{p['name']} | Quantity - {p['quantity']} | "
+                        f"Price - {p['price']} | Unit - {p['unit']}"
+                    )
+                    found = True
+
+            # Guard: keyword was provided but no product matched
+            if not found:
+                messagebox.showerror("Error", "Invalid Input")
+
+        tk.Button(
+            self.content, text="Search",
+            font=self.button_font,
+            bg=self.ACCENT,
+            fg=self.TEXT,
+            command=search
+        ).pack()
