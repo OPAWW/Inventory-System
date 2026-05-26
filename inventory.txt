@@ -1,4 +1,0 @@
-001|orens|Food|fruit|12|10
-002|afol|Food|sacks|7|89
-003|fern|Electronics|ios|2|4000
-fitsay|fitsay|Food|ksds|89|3434
